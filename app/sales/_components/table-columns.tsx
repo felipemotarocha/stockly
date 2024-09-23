@@ -3,7 +3,6 @@
 import { Button } from "@/app/_components/ui/button";
 import { SaleDto } from "@/app/_data-access/sale/get-sales";
 import { formatCurrency } from "@/app/_helpers/currency";
-import { Sale } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontalIcon } from "lucide-react";
 
