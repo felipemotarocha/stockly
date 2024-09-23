@@ -8,15 +8,43 @@ import { returnValidationErrors } from "next-safe-action";
 
 export const createSale = actionClient
   .schema(createSaleSchema)
-  .action(async ({ parsedInput: { products } }) => {
+  .action(async ({ parsedInput: { saleId, products } }) => {
     await db.$transaction(async (trx) => {
+      if (saleId) {
+        const existingSale = await trx.sale.findUnique({
+          where: {
+            id: saleId,
+          },
+          include: {
+            saleProducts: true,
+          },
+        });
+        if (!existingSale) return;
+        await trx.sale.delete({
+          where: {
+            id: saleId,
+          },
+        });
+        for (const product of existingSale?.saleProducts) {
+          await trx.product.update({
+            where: {
+              id: product.productId,
+            },
+            data: {
+              stock: {
+                increment: product.quantity,
+              },
+            },
+          });
+        }
+      }
       const sale = await trx.sale.create({
         data: {
           date: new Date(),
         },
       });
       for (const product of products) {
-        const productFromDb = await db.product.findUnique({
+        const productFromDb = await trx.product.findUnique({
           where: {
             id: product.id,
           },

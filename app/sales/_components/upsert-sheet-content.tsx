@@ -35,11 +35,11 @@ import { CheckIcon, PlusIcon } from "lucide-react";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import SalesTableDropdownMenu from "./table-dropdown-menu";
 import { createSale } from "@/app/_actions/sale/create-sale";
 import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
 import { flattenValidationErrors } from "next-safe-action";
+import SalesUpsertTableDropdownMenu from "./upsert-table-dropdown-menu";
 
 const formSchema = z.object({
   productId: z.string().uuid({
@@ -51,6 +51,8 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 interface UpsertSheetContentProps {
+  saleId?: string;
+  defaultSelectedProducts?: SelectedProduct[];
   products: Product[];
   productOptions: ComboboxOption[];
   setSheetIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -63,13 +65,15 @@ interface SelectedProduct {
   quantity: number;
 }
 
-const UpsertSheetContent = ({
+const UpsertSaleSheetContent = ({
+  saleId,
+  defaultSelectedProducts,
   products,
   productOptions,
   setSheetIsOpen,
 }: UpsertSheetContentProps) => {
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
-    [],
+    defaultSelectedProducts ?? [],
   );
   const { execute: executeCreateSale } = useAction(createSale, {
     onError: ({ error: { validationErrors, serverError } }) => {
@@ -77,8 +81,8 @@ const UpsertSheetContent = ({
       toast.error(serverError ?? flattenedErrors.formErrors[0]);
     },
     onSuccess: () => {
-      toast.success("Venda realizada com sucesso.");
       setSheetIsOpen(false);
+      toast.success("Venda realizada com sucesso.");
     },
   });
 
@@ -149,6 +153,7 @@ const UpsertSheetContent = ({
   };
   const onSubmitSale = async () => {
     executeCreateSale({
+      saleId,
       products: selectedProducts.map((product) => ({
         id: product.id,
         quantity: product.quantity,
@@ -230,7 +235,10 @@ const UpsertSheetContent = ({
                 {formatCurrency(product.price * product.quantity)}
               </TableCell>
               <TableCell>
-                <SalesTableDropdownMenu product={product} onDelete={onDelete} />
+                <SalesUpsertTableDropdownMenu
+                  product={product}
+                  onDelete={onDelete}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -258,4 +266,4 @@ const UpsertSheetContent = ({
   );
 };
 
-export default UpsertSheetContent;
+export default UpsertSaleSheetContent;

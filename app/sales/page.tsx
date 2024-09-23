@@ -3,14 +3,18 @@ import { DataTable } from "../_components/ui/data-table";
 import { getProducts } from "../_data-access/product/get-products";
 import { getSales } from "../_data-access/sale/get-sales";
 import CreateSaleButton from "./_components/create-sale-button";
-import { saleTableColumns } from "./_components/table-columns";
+import { SaleRow, saleTableColumns } from "./_components/table-columns";
 
 const SalesPage = async () => {
-  const sales = await getSales();
   const products = await getProducts();
   const productOptions: ComboboxOption[] = products.map((product) => ({
     label: product.name,
     value: product.id,
+  }));
+  const sales: SaleRow[] = (await getSales()).map((sale) => ({
+    ...sale,
+    products,
+    upsertSheetProductOptions: productOptions,
   }));
   return (
     <div className="m-8 w-full space-y-8 rounded-lg bg-white p-8">
