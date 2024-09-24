@@ -7,7 +7,6 @@ interface MostSoldProductProps {
 }
 
 const MostSoldProductItem = ({ product }: MostSoldProductProps) => {
-  console.log({ product });
   return (
     <div className="flex items-center justify-between">
       <div className="space-y-[6px]">
