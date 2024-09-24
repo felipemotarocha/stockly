@@ -8,10 +8,35 @@ import { revalidatePath } from "next/cache";
 export const deleteSale = actionClient
   .schema(deleteSaleSchema)
   .action(async ({ parsedInput: { id } }) => {
-    await db.sale.delete({
-      where: {
-        id,
-      },
+    await db.$transaction(async (trx) => {
+      const sale = await trx.sale.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          saleProducts: true,
+        },
+      });
+      if (!sale) return;
+      await trx.sale.delete({
+        where: {
+          id,
+        },
+      });
+      for (const product of sale.saleProducts) {
+        await trx.product.update({
+          where: {
+            id: product.productId,
+          },
+          data: {
+            stock: {
+              increment: product.quantity,
+            },
+          },
+        });
+      }
     });
     revalidatePath("/sales");
+    revalidatePath("/products");
+    revalidatePath("/");
   });
