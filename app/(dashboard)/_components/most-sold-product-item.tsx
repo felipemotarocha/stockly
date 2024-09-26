@@ -1,5 +1,5 @@
 import ProductStatusBadge from "@/app/_components/product-status-badge";
-import { MostSoldProductDto } from "@/app/_data-access/dashboard/get-dashboard";
+import { MostSoldProductDto } from "@/app/_data-access/dashboard/get-most-sold-products";
 import { formatCurrency } from "@/app/_helpers/currency";
 
 interface MostSoldProductProps {

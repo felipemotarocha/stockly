@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/app/_components/ui/dropdown-menu";
-import { Product } from "@prisma/client";
 import {
   MoreHorizontalIcon,
   ClipboardCopyIcon,
@@ -22,9 +21,10 @@ import {
 import { useState } from "react";
 import DeleteProductDialogContent from "./delete-dialog-content";
 import UpsertProductDialogContent from "./upsert-dialog-content";
+import { ProductDto } from "@/app/_data-access/product/get-products";
 
 interface ProductTableDropdownMenuProps {
-  product: Product;
+  product: ProductDto;
 }
 
 const ProductTableDropdownMenu = ({
